@@ -27,6 +27,7 @@ public class EchoServer {
             // client가 오지 않으면 blocking상태.. data accept 할거야! 어 근데 accept 할것이 없네...... 기다리자...
             Socket socket = serverSocket.accept();
             clients.add(socket);
+
             new Thread(()->{
                 System.out.printf("connected from %s\n", socket.getInetAddress());
 
@@ -35,26 +36,37 @@ public class EchoServer {
                     // reader : 귀! 암리스닝~~
                     BufferedReader in = new BufferedReader(new InputStreamReader(ois));
                     PrintWriter out = new PrintWriter(os, true);) {
-                        // blocking 함수 당 thread를 하나씩 쓴다고 생각햐.
-                        String line = in.readLine(); // data 언제오시죠??? data가 올 때까지 blocking한당
-                        System.out.printf("%s: %s\n", socket.getInetAddress(), line);
 
-                        out.println(line); // echo!!!!
-                        
+                        while(true) {
+                            // blocking 함수 당 thread를 하나씩 쓴다고 생각햐.
+                            String line = in.readLine(); // data 언제오시죠??? data가 올 때까지 blocking한당
+                            System.out.printf("%s: %s\n", socket.getInetAddress(), line);
+
+                            out.println(line); // echo!!!!
+
+                            if("bye".equals(line))
+                                break;
+                        }
                         // 예외처리를 하면 close를 자동으로 해주는 기능이 추가되어따(JDK1.8)
                         // in.close();
                         // out.close();
                         // os.close();
                         // ois.close();
-                        // socket.close();
-                        // serverSocket.close();
+                       
 
                 } catch(IOException e) {
                     e.printStackTrace();
                 }
                 
             }).start();
+
+            socket.close();
+            
         }
+
+        // sub thread들이 다 끝나면 그때 main thread를 닫을 수 있을까??
+        // join() 메소드를 쓰면 sub thread를 기다렸다가 같이 간다! 라고 해주는것이다....
+        serverSocket.close();
         // Scanner scan = '문자를 숫자로 변환해서 읽어들임';
         // BufferedInputStream bis = '문자열을 한글자 한글자 버퍼에 넣어 담아요';
     }

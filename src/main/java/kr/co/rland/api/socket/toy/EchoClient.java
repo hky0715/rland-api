@@ -14,7 +14,7 @@ import java.net.Socket;
 public class EchoClient {
     public static void main(String[] args) throws IOException {
         // 서버소켓을 사용하지 않고 직접 데이터소켓을 만든다!
-        Socket socket = new Socket("127.0.0.1", 10004); // 클라이언트는 자기가 포트를 binding하는게 아님. data port는 서버가 남는걸 알아서 주는것.
+        Socket socket = new Socket("192.168.0.94", 10004); // 클라이언트는 자기가 포트를 binding하는게 아님. data port는 서버가 남는걸 알아서 주는것.
         System.out.printf("connected from %s\n", socket.getInetAddress());
 
         InputStream ois = socket.getInputStream();
@@ -27,17 +27,23 @@ public class EchoClient {
         // 1. 사용자로부터 메아리를 할 수 있는 메시지를 입력받음
         Scanner scan = new Scanner(System.in);
         String msg;
-        System.out.println("msg: ");
-        msg = scan.nextLine();
 
-        // 2. 사용자로부터 입력받은 메시지를 전송한다.
-        out.println(msg);
+        while(true) {
+            System.out.println("msg: ");
+            msg = scan.nextLine();
 
-        // 3. 서버로부터 전달된 line을 읽어온다.
-        String line = in.readLine();
+            // 2. 사용자로부터 입력받은 메시지를 전송한다.
+            out.println(msg);
 
-        // 4. 콘솔에 line을 출력한다.
-        System.out.println(line); // echo!!!!
+            // 3. 서버로부터 전달된 line을 읽어온다.
+            String line = in.readLine();
+
+            // 4. 콘솔에 line을 출력한다.
+            System.out.println(line); // echo!!!!
+
+            if ("bye".equals(line))
+                break;
+        }
 
         in.close();
         out.close();
